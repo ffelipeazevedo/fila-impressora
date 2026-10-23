@@ -1,0 +1,9 @@
+# Executáveis e objetos
+*.o
+*.exe
+*.out
+a.out
+
+# IDE
+.vscode/
+.idea/
