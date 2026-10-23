@@ -15,3 +15,13 @@ typedef struct fila {
 } Fila;
 
 
+
+
+
+
+// Função para inicilizar a lista 
+void inicializa_fila(Fila *f){
+    f->inicio = NULL;
+    f->fim = NULL;
+    f->total = 0;
+}
