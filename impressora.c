@@ -45,6 +45,26 @@ void enfileira(Fila *f, int prioridade, char *ip){
     f->total++;
 }
 
+
+// Imprime todas as solicitações da fila, do início ao fim
+void imprime_fila(Fila *f, char *nome){
+    Solicitacao *aux;
+
+    printf("%s (%d): ", nome, f->total);        // cabeçalho: nome e quantidade
+
+    if (f->inicio == NULL) {                    // fila vazia
+        printf("vazia\n");
+        return;
+    }
+
+    // percorre do primeiro nodo até o fim (quando aux vira NULL)
+    for (aux = f->inicio; aux != NULL; aux = aux->prox) {
+        printf("[%d | %s] ", aux->prioridade, aux->ip);
+    }
+    printf("\n");                             
+}
+
+
 // Imprimi a solicitação do inicio da fila (Remove do Inicio)
 int desinfileira(Fila *f, int *prioridade, char *ip){
     Solicitacao *aux;
