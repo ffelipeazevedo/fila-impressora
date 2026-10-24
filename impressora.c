@@ -69,7 +69,7 @@ void imprime_fila(Fila *f, char *nome){
 int desinfileira(Fila *f, int *prioridade, char *ip){
     Solicitacao *aux;
 
-    if(f->total == NULL){
+    if(f->inicio == NULL){
         return 0;
     }
 
