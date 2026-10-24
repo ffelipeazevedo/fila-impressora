@@ -17,18 +17,39 @@ typedef struct fila {
 // Funcoes
 void inicializa_fila(Fila *f);
 Solicitacao *cria_nodo(int prioridade, char *ip);
+void enfileira(Fila *f, int prioridade, char *ip);
 
 
 
-
-// Função para inicilizar a lista 
+// Funcao para inicilizar a lista 
 void inicializa_fila(Fila *f){
     f->inicio = NULL;
     f->fim = NULL;
     f->total = 0;
 }
 
-// A função cria_nodo recebe a prioridade e o IP de uma solicitação e retorna o endereço de um novo nodo
+// Funcao enfileira lista (Insere no inicio)
+void enfileira(Fila *f, int prioridade, char *ip){
+    Solicitacao *novo;
+    novo = cria_nodo(prioridade, ip);
+
+    if(f->inicio == NULL){
+        f->inicio = novo;
+        f->fim = novo;
+    } else {
+        f->fim->prox = novo;
+        f->fim = novo;
+        
+    }
+
+    f->total++;
+}
+
+
+
+
+
+// A funcao cria_nodo recebe a prioridade e o IP de uma solicitação e retorna o endereço de um novo nodo
 Solicitacao *cria_nodo(int prioridade, char *ip){
     Solicitacao *aux;
 
