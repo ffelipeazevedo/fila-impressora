@@ -28,7 +28,7 @@ void inicializa_fila(Fila *f){
     f->total = 0;
 }
 
-// Funcao enfileira lista (Insere no inicio)
+// Insere uma solicitação no FIM da fila
 void enfileira(Fila *f, int prioridade, char *ip){
     Solicitacao *novo;
     novo = cria_nodo(prioridade, ip);
