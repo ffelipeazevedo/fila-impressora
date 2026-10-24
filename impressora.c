@@ -18,7 +18,7 @@ typedef struct fila {
 void inicializa_fila(Fila *f);
 Solicitacao *cria_nodo(int prioridade, char *ip);
 void enfileira(Fila *f, int prioridade, char *ip);
-
+int desinfileira(Fila *f, int *prioridade, char *ip);
 
 
 // Funcao para inicilizar a lista 
@@ -45,7 +45,28 @@ void enfileira(Fila *f, int prioridade, char *ip){
     f->total++;
 }
 
+// Imprimi a solicitação do inicio da fila (Remove do Inicio)
+int desinfileira(Fila *f, int *prioridade, char *ip){
+    Solicitacao *aux;
 
+    if(f->total == NULL){
+        return 0;
+    }
+
+    aux = f->inicio;
+    *prioridade = aux->prioridade;
+    strcpy(ip, aux->ip);
+
+    f->inicio = f->inicio->prox;
+    if (f->total == NULL){
+        f->fim = NULL;
+    }
+    
+    free(aux);
+    f->total--;
+
+    return 1;
+}
 
 
 
