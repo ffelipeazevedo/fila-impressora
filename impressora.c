@@ -27,6 +27,79 @@ void liberar_fila(Fila *f);                            // libera memoria
 int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
 
 
+// Menu provisório para testar as funções da fila
+int main(){
+    Fila entrada;           // a Fila de Entrada (o cabeçalho fica aqui no main)
+    int opcao;              // opção escolhida no menu
+    int prio;               // prioridade digitada ou removida
+    int qtd;                // quantidade de solicitações a gerar
+    char ip[16];            // IP digitado ou removido
+    
+    srand(time(NULL));
+
+    inicializa_fila(&entrada);      // começa com a fila vazia
+
+    for (;;) {                      // loop infinito: só sai pelo "return" da opção 0
+        printf("\n===== MENU DE TESTE =====\n");
+        printf("1. Gerar arquivo de solicitacoes\n");
+        printf("2. Enfileirar manualmente\n");
+        printf("3. Desenfileirar\n");
+        printf("4. Imprimir fila de entrada\n");
+        printf("5. Liberar fila\n");
+        printf("0. Sair\n");
+        printf("Opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Quantas solicitacoes (minimo 50)? ");
+                scanf("%d", &qtd);
+                if (qtd < 50) {                         // o enunciado exige no mínimo 50
+                    printf("Quantidade invalida! Minimo de 50.\n");
+                    break;
+                }
+                if (gera_arquivo("solicitacoes.txt", qtd) == 1)
+                    printf("Arquivo gerado! Abra o solicitacoes.txt para conferir.\n");
+                break;
+
+            case 2:
+                printf("Prioridade (1-3): ");
+                scanf("%d", &prio);
+                printf("IP: ");
+                scanf("%15s", ip);                      // %15s: lê no máximo 15 caracteres
+                enfileira(&entrada, prio, ip);
+                printf("Solicitacao enfileirada!\n");
+                break;
+
+            case 3:
+                if (desenfileira(&entrada, &prio, ip) == 0)
+                    printf("Fila vazia! Nada a remover.\n");
+                else
+                    printf("Saiu da fila: [%d | %s]\n", prio, ip);
+                break;
+
+            case 4:
+                imprime_fila(&entrada, "Entrada");
+                break;
+
+            case 5:
+                liberar_fila(&entrada);
+                printf("Fila liberada!\n");
+                break;
+
+            // case 6: carrega_arquivo (quando estiver pronta)
+
+            case 0:
+                liberar_fila(&entrada);                  // devolve a memória antes de sair
+                printf("Saindo...\n");
+                return 0;                               // encerra o main (e o loop)
+
+            default:
+                printf("Opcao invalida!\n");
+        }
+    }
+}
+
 // preenche o arquivo txt com as solicitacoes - simulando pessoas 
 // Gera um arquivo com solicitações de impressão aleatórias
 // Retorna 1 se gerou, 0 se não conseguiu criar o arquivo
