@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
+#define TOTAL_COMPUTADORES 15
 
 typedef struct solicitacao {
     char ip[16];                 // identificação: IP de quem pediu
@@ -21,6 +24,39 @@ Solicitacao *cria_nodo(int prioridade, char *ip);      // cria um no
 void enfileira(Fila *f, int prioridade, char *ip);     // adiciona no fim
 int desenfileira(Fila *f, int *prioridade, char *ip);  // retira do inicio
 void liberar_fila(Fila *f);                            // libera memoria
+int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
+
+
+// preenche o arquivo txt com as solicitacoes - simulando pessoas 
+// Gera um arquivo com solicitações de impressão aleatórias
+// Retorna 1 se gerou, 0 se não conseguiu criar o arquivo
+int gera_arquivo(char *nome_arquivo, int quantidade){
+    FILE *arq;
+    int i, prioridade, sorteio;
+    char ip[16];
+
+    arq = fopen(nome_arquivo, "w");              // abre o arquivo para ESCRITA
+    if (arq == NULL) {                     
+        printf("Erro ao criar o arquivo %s\n", nome_arquivo);
+        return 0;
+    }
+
+    for (i = 0; i < quantidade; i++) {
+        prioridade = rand() % 3 + 1;              // sorteia de 1 a 3
+
+        sorteio = (rand() % TOTAL_COMPUTADORES + 1);
+        sprintf(ip, "192.168.0.%d", sorteio);     // monta o IP no vetor ip (sprintf)
+
+        fprintf(arq, "%d, %s; ", prioridade, ip); // escreve "prioridade, ip; " no arquivo (fprintf)
+
+        if ((i + 1) % 5 == 0) {  // a cada 5 solicitações...   
+            fprintf(arq, "\n");
+        }                           
+    }
+
+    fclose(arq);                 
+    return 1;
+}
 
 
 
