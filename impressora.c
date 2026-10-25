@@ -16,6 +16,7 @@ typedef struct fila {
 
 // Funcoes
 void inicializa_fila(Fila *f);
+void imprime_fila(Fila *f, char *nome);
 Solicitacao *cria_nodo(int prioridade, char *ip);
 void enfileira(Fila *f, int prioridade, char *ip);
 int desinfileira(Fila *f, int *prioridade, char *ip);
