@@ -15,12 +15,12 @@ typedef struct fila {
 } Fila;
 
 // Funcoes
-void inicializa_fila(Fila *f);
-void imprime_fila(Fila *f, char *nome);
-Solicitacao *cria_nodo(int prioridade, char *ip);
-void enfileira(Fila *f, int prioridade, char *ip);
-int desenfileira(Fila *f, int *prioridade, char *ip);
-void liberar_fila(Fila *f);
+void inicializa_fila(Fila *f);                         // iniciliza a fila
+void imprime_fila(Fila *f, char *nome);                // imprimi fila
+Solicitacao *cria_nodo(int prioridade, char *ip);      // cria um no 
+void enfileira(Fila *f, int prioridade, char *ip);     // adiciona no fim
+int desenfileira(Fila *f, int *prioridade, char *ip);  // retira do inicio
+void liberar_fila(Fila *f);                            // libera memoria
 
 
 
