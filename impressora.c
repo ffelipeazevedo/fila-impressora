@@ -19,7 +19,7 @@ void inicializa_fila(Fila *f);
 void imprime_fila(Fila *f, char *nome);
 Solicitacao *cria_nodo(int prioridade, char *ip);
 void enfileira(Fila *f, int prioridade, char *ip);
-int desinfileira(Fila *f, int *prioridade, char *ip);
+int desenfileira(Fila *f, int *prioridade, char *ip);
 
 
 // Funcao para inicilizar a lista 
@@ -67,7 +67,7 @@ void imprime_fila(Fila *f, char *nome){
 
 
 // Imprimi a solicitação do inicio da fila (Remove do Inicio)
-int desinfileira(Fila *f, int *prioridade, char *ip){
+int desenfileira(Fila *f, int *prioridade, char *ip){
     Solicitacao *aux;
 
     if(f->inicio == NULL){
@@ -79,7 +79,7 @@ int desinfileira(Fila *f, int *prioridade, char *ip){
     strcpy(ip, aux->ip);
 
     f->inicio = f->inicio->prox;
-    if (f->total == NULL){
+    if (f->total == 0){
         f->fim = NULL;
     }
     
