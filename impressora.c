@@ -190,7 +190,7 @@ int desenfileira(Fila *f, int *prioridade, char *ip){
     strcpy(ip, aux->ip);
 
     f->inicio = f->inicio->prox;
-    if (f->total == 0){
+    if (f->inicio == NULL){
         f->fim = NULL;
     }
     
