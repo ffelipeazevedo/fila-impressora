@@ -22,6 +22,7 @@ void enfileira(Fila *f, int prioridade, char *ip);
 int desenfileira(Fila *f, int *prioridade, char *ip);
 
 
+
 // Funcao para inicilizar a lista 
 void inicializa_fila(Fila *f){
     f->inicio = NULL;
@@ -89,6 +90,23 @@ int desenfileira(Fila *f, int *prioridade, char *ip){
     return 1;
 }
 
+// Libera a memoria dos Nos alocados
+void liberar_fila(Fila *f){
+    Solicitacao *aux, *prox;
+
+    aux = f->inicio; 
+
+    while(aux != NULL){
+        prox = aux->prox;
+        free(aux);
+        aux = prox;
+    }
+
+    // fila vazia
+    f->inicio = NULL;
+    f->fim = NULL;
+    f->total = 0;
+}
 
 
 // A funcao cria_nodo recebe a prioridade e o IP de uma solicitação e retorna o endereço de um novo nodo
