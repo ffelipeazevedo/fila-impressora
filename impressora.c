@@ -20,6 +20,7 @@ void imprime_fila(Fila *f, char *nome);
 Solicitacao *cria_nodo(int prioridade, char *ip);
 void enfileira(Fila *f, int prioridade, char *ip);
 int desenfileira(Fila *f, int *prioridade, char *ip);
+void liberar_fila(Fila *f);
 
 
 
