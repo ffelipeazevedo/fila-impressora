@@ -18,14 +18,14 @@ typedef struct fila {
 } Fila;
 
 // Funcoes
-void inicializa_fila(Fila *f);                         // iniciliza a fila
-void imprime_fila(Fila *f, char *nome);                // imprimi fila
-Solicitacao *cria_nodo(int prioridade, char *ip);      // cria um no 
-void enfileira(Fila *f, int prioridade, char *ip);     // adiciona no fim
-int desenfileira(Fila *f, int *prioridade, char *ip);  // retira do inicio
-void liberar_fila(Fila *f);                            // libera memoria
+void inicializa_fila(Fila *f);                          // iniciliza a fila
+void imprime_fila(Fila *f, char *nome);                 // imprimi fila
+Solicitacao *cria_nodo(int prioridade, char *ip);       // cria um no 
+void enfileira(Fila *f, int prioridade, char *ip);      // adiciona no fim
+int desenfileira(Fila *f, int *prioridade, char *ip);   // retira do inicio
+void liberar_fila(Fila *f);                             // libera memoria
 int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
-
+int carrega_arquivo(char *nome_arquivo, Fila *entrada); // carrega solicitacoes
 
 // Menu provisório para testar as funções da fila
 int main(){
@@ -39,7 +39,7 @@ int main(){
 
     inicializa_fila(&entrada);      // começa com a fila vazia
 
-    for (;;) {                      // loop infinito: só sai pelo "return" da opção 0
+    for (;;) {                      
         printf("\n===== MENU DE TESTE =====\n");
         printf("1. Gerar arquivo de solicitacoes\n");
         printf("2. Enfileirar manualmente\n");
@@ -87,8 +87,19 @@ int main(){
                 printf("Fila liberada!\n");
                 break;
 
-            // case 6: carrega_arquivo (quando estiver pronta)
-
+            case 6:
+                qtd = carrega_arquivo("solicitacoes.txt", &entrada);
+                if (qtd == -1){
+                    break;
+                }
+                printf("%d solicitacoes carregadas.\n", qtd);
+                if (qtd < 50){
+                    printf("Atencao: o enunciado exige no minimo 50!\n");
+                    imprime_fila(&entrada, "Entrada");
+                    break;
+                }
+                break;
+                
             case 0:
                 liberar_fila(&entrada);                  // devolve a memória antes de sair
                 printf("Saindo...\n");
@@ -98,6 +109,33 @@ int main(){
                 printf("Opcao invalida!\n");
         }
     }
+}
+
+// Abre o solicitacoes.txt, lê cada par prioridade + IP e chama o enfileira 
+// para colocar na Fila de Entrada. No final, retorna quantas solicitações leu.
+
+int carrega_arquivo(char *nome_arquivo, Fila *entrada){
+    FILE *arq;
+    int prio_lida;
+    char ip_lido[16];
+    int total_lido = 0;
+
+    arq = fopen(nome_arquivo, "r");
+    if (arq == NULL) {                     
+        printf("Erro ao abrir o arquivo %s\n", nome_arquivo);
+        return -1;
+    }
+
+    while (fscanf(arq, " %d, %15[^;];", &prio_lida, ip_lido) == 2) {
+        if (prio_lida >= 1 && prio_lida <= 3) {                
+            enfileira(entrada, prio_lida, ip_lido);                
+            total_lido++;                   
+        } else {
+            printf("Prioridade invalida ignorada: %d\n", prio_lida);
+        }
+    }
+    fclose(arq);
+    return total_lido;
 }
 
 // preenche o arquivo txt com as solicitacoes - simulando pessoas 
