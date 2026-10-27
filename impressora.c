@@ -200,7 +200,7 @@ void enfileira(Fila *f, int prioridade, char *ip){
 void imprime_fila(Fila *f, char *nome){
     Solicitacao *aux;
 
-    printf("%s (%d): ", nome, f->total);        // cabeçalho: nome e quantidade
+    printf("\n%s (%d): \n", nome, f->total);        // cabeçalho: nome e quantidade
 
     if (f->inicio == NULL) {                    // fila vazia
         printf("vazia\n");
@@ -209,7 +209,7 @@ void imprime_fila(Fila *f, char *nome){
 
     // percorre do primeiro nodo até o fim (quando aux vira NULL)
     for (aux = f->inicio; aux != NULL; aux = aux->prox) {
-        printf("[%d | %s] ", aux->prioridade, aux->ip);
+        printf("[%d | %s] \n", aux->prioridade, aux->ip);
     }
     printf("\n");                             
 }
