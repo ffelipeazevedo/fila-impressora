@@ -40,8 +40,9 @@ int main(){
     srand(time(NULL));
 
     inicializa_fila(&entrada);      // começa com a fila vazia
+    
     for (int i = 0; i < 3; i++){
-        inicializa_fila(&entrada);
+        inicializa_fila(&filas[i]);
     }
 
     for (;;) {                   
