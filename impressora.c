@@ -44,7 +44,7 @@ int main(){
         inicializa_fila(&entrada);
     }
 
-    for (;;) {                      
+    for (;;) {                   
         printf("\n===== MENU DE TESTE =====\n");
         printf("1. Gerar arquivo de solicitacoes\n");
         printf("2. Enfileirar manualmente\n");
@@ -92,6 +92,7 @@ int main(){
             case 5:
                 for (int i = 0; i < 3; i++){
                     liberar_fila(&entrada);
+                }
                     printf("Fila liberada!\n");
                 break;
 
@@ -118,8 +119,10 @@ int main(){
                   
                 break;
             case 0:
-                for (int i = 0; i < 3; i++){
-                    liberar_fila(&entrada);                 // devolve a memória antes de sair
+                // devolve a memória antes de sair
+                for (int i = 0; i < 3; i++){ 
+                    liberar_fila(&entrada);     
+                }            
                 printf("Saindo...\n");
                 return 0;                           
 
