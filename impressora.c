@@ -91,12 +91,14 @@ int main(){
                 break;
 
             case 5:
-                for (int i = 0; i < 3; i++){
-                    liberar_fila(&entrada);
-                }
-                    printf("Fila liberada!\n");
-                break;
+                liberar_fila(&entrada);   
+                for (int i = 0; i < 3; i++){ 
+                    liberar_fila(&filas[i]);     
+                } 
 
+                printf("Fila liberada!\n");
+                break;
+                
             case 6:
                 qtd = carrega_arquivo("solicitacoes.txt", &entrada);
                 if (qtd == -1){
@@ -121,8 +123,9 @@ int main(){
                 break;
             case 0:
                 // devolve a memória antes de sair
+                liberar_fila(&entrada);   
                 for (int i = 0; i < 3; i++){ 
-                    liberar_fila(&entrada);     
+                    liberar_fila(&filas[i]);     
                 }            
                 printf("Saindo...\n");
                 return 0;                           
