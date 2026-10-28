@@ -142,7 +142,6 @@ int distribui(Fila *entrada, Fila filas[], int qtd){
 
 
     for(int i = 0; i < qtd; i++){
-        desenfileira(entrada, &prioridade, ip);
         if(desenfileira(entrada, &prioridade, ip) == 0){
             break;
         }
