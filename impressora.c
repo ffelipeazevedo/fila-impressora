@@ -26,10 +26,12 @@ int desenfileira(Fila *f, int *prioridade, char *ip);   // retira do inicio
 void liberar_fila(Fila *f);                             // libera memoria
 int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
 int carrega_arquivo(char *nome_arquivo, Fila *entrada); // carrega solicitacoes
+int distribui(Fila *entrada, Fila filas[], int qtd);    // distribui as solicitacoes nas filas
 
 // Menu provisório para testar as funções da fila
 int main(){
-    Fila entrada;           // a Fila de Entrada (o cabeçalho fica aqui no main)
+    Fila entrada;   
+    Fila filas[3];  
     int opcao;              // opção escolhida no menu
     int prio;               // prioridade digitada ou removida
     int qtd;                // quantidade de solicitações a gerar
@@ -38,6 +40,9 @@ int main(){
     srand(time(NULL));
 
     inicializa_fila(&entrada);      // começa com a fila vazia
+    for (int i = 0; i < 3; i++){
+        inicializa_fila(&entrada);
+    }
 
     for (;;) {                      
         printf("\n===== MENU DE TESTE =====\n");
@@ -46,6 +51,8 @@ int main(){
         printf("3. Desenfileirar\n");
         printf("4. Imprimir fila de entrada\n");
         printf("5. Liberar fila\n");
+        printf("6. Carregar solicitacoes\n");
+        printf("7. Distibuir solicitacoes\n");
         printf("0. Sair\n");
         printf("Opcao: ");
         scanf("%d", &opcao);
@@ -54,7 +61,7 @@ int main(){
             case 1:
                 printf("Quantas solicitacoes (minimo 50)? ");
                 scanf("%d", &qtd);
-                if (qtd < 50) {                         // o enunciado exige no mínimo 50
+                if (qtd < 50) {                        
                     printf("Quantidade invalida! Minimo de 50.\n");
                     break;
                 }
@@ -66,7 +73,7 @@ int main(){
                 printf("Prioridade (1-3): ");
                 scanf("%d", &prio);
                 printf("IP: ");
-                scanf("%15s", ip);                      // %15s: lê no máximo 15 caracteres
+                scanf("%15s", ip);                      
                 enfileira(&entrada, prio, ip);
                 printf("Solicitacao enfileirada!\n");
                 break;
@@ -83,8 +90,9 @@ int main(){
                 break;
 
             case 5:
-                liberar_fila(&entrada);
-                printf("Fila liberada!\n");
+                for (int i = 0; i < 3; i++){
+                    liberar_fila(&entrada);
+                    printf("Fila liberada!\n");
                 break;
 
             case 6:
@@ -99,17 +107,48 @@ int main(){
                     break;
                 }
                 break;
-                
+            
+            case 7:
+                qtd = distribui(&entrada, filas, 5);     
+                printf("%d solicitacoes distribuidas.\n", qtd);
+                imprime_fila(&entrada, "Entrada");
+                imprime_fila(&filas[0], "Fila 0");
+                imprime_fila(&filas[1], "Fila 1");
+                imprime_fila(&filas[2], "Fila 2");
+                  
+                break;
             case 0:
-                liberar_fila(&entrada);                  // devolve a memória antes de sair
+                for (int i = 0; i < 3; i++){
+                    liberar_fila(&entrada);                 // devolve a memória antes de sair
                 printf("Saindo...\n");
-                return 0;                               // encerra o main (e o loop)
+                return 0;                           
 
             default:
                 printf("Opcao invalida!\n");
         }
     }
 }
+
+// Executa um ciclo de distribuição: tira até 5 solicitações do início da
+// Fila de Entrada e manda cada uma para a fila da sua prioridade.
+int distribui(Fila *entrada, Fila filas[], int qtd){
+    int prioridade; // vem da entrada
+    char ip[16];
+    int cont = 0;
+
+
+    for(int i = 0; i < qtd; i++){
+        desenfileira(entrada, &prioridade, ip);
+        if(desenfileira(entrada, &prioridade, ip) == 0){
+            break;
+        }
+        enfileira(&filas[prioridade - 1], prioridade, ip);
+        cont++;
+    }
+
+    return cont;
+}
+
 
 // Abre o solicitacoes.txt, lê cada par prioridade + IP e chama o enfileira 
 // para colocar na Fila de Entrada. No final, retorna quantas solicitações leu.
