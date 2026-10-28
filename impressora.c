@@ -1,9 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <time.h>         
+#include <windows.h>  
 
+//constantes
 #define TOTAL_COMPUTADORES 15
+#define INTERVALO_MS 500
 
 typedef struct solicitacao {
     char ip[16];                 // identificação: IP de quem pediu
@@ -27,6 +30,7 @@ void liberar_fila(Fila *f);                             // libera memoria
 int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
 int carrega_arquivo(char *nome_arquivo, Fila *entrada); // carrega solicitacoes
 int distribui(Fila *entrada, Fila filas[], int qtd);    // distribui as solicitacoes nas filas
+void espera(int ms);                                    // delay 0.05 seg
 
 // Menu provisório para testar as funções da fila
 int main(){
@@ -98,7 +102,7 @@ int main(){
 
                 printf("Fila liberada!\n");
                 break;
-                
+
             case 6:
                 qtd = carrega_arquivo("solicitacoes.txt", &entrada);
                 if (qtd == -1){
@@ -134,6 +138,11 @@ int main(){
                 printf("Opcao invalida!\n");
         }
     }
+}
+
+// Pausa do programa de 0.5 segundos a cada distribuição
+void espera(int ms){
+    Sleep(ms);              // Windows: já recebe em milissegundos
 }
 
 // Executa um ciclo de distribuição: tira até 5 solicitações do início da
