@@ -276,5 +276,5 @@ Em `liberar_fila`, o endereço do próximo nodo é guardado **antes** de liberar
 
 ## Autor
 
-**Felipe Fernandes de Azevedo**: Aplicação de Fila (fila de impressão)
+**Felipe Fernandes de Azevedo**: Aplicação de Fila (fila de impressão)<br>
 Professora: Dra. Andreia de Jesus
