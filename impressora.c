@@ -7,6 +7,7 @@
 //constantes
 #define TOTAL_COMPUTADORES 15
 #define INTERVALO_MS 500
+#define CICLO 5
 
 typedef struct solicitacao {
     char ip[16];                 // identificação: IP de quem pediu
@@ -31,6 +32,7 @@ int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
 int carrega_arquivo(char *nome_arquivo, Fila *entrada); // carrega solicitacoes
 int distribui(Fila *entrada, Fila filas[], int qtd);    // distribui as solicitacoes nas filas
 void espera(int ms);                                    // delay 0.05 seg
+int simular_distribuicao(Fila *entrada, Fila filas[]);   // simulacao distribuicao de acordo com ciclo
 
 // Menu provisório para testar as funções da fila
 int main(){
@@ -125,6 +127,10 @@ int main(){
                 imprime_fila(&filas[2], "Fila 2");
                   
                 break;
+            case 8:
+                simular_distribuicao(&entrada, filas);
+                break;
+
             case 0:
                 // devolve a memória antes de sair
                 liberar_fila(&entrada);   
@@ -139,6 +145,38 @@ int main(){
         }
     }
 }
+
+
+// Simulador de Impressora
+int simular_distribuicao(Fila *entrada, Fila filas[]){
+    int ciclo = 1;
+    int qtd;
+
+    if (entrada ->inicio == NULL){
+        printf("Fila de entrada vazia! Carregue o arquivo primeiro.\n");
+        return 0;
+    }
+
+    while (entrada->inicio != NULL){
+        qtd = distribui(entrada, filas, CICLO);
+
+        printf("\n========== CICLO %d ==========\n", ciclo);
+        printf("%d solicitacoes distribuidas\n", qtd);
+
+        imprime_fila(entrada, "Entrada");
+        imprime_fila(&filas[0], "Fila 0");
+        imprime_fila(&filas[1], "Fila 1");
+        imprime_fila(&filas[2], "Fila 2");
+
+        // pausar
+        espera(INTERVALO_MS);
+        ciclo++;
+    }
+
+    printf("\nDistribuicao concluida em %d ciclos!\n", qtd);
+    return ciclo - 1;
+}
+
 
 // Pausa do programa de 0.5 segundos a cada distribuição
 void espera(int ms){
