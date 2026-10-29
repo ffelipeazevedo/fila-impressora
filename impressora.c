@@ -4,10 +4,12 @@
 #include <time.h>         
 #include <windows.h>  
 
-//constantes
-#define TOTAL_COMPUTADORES 15
-#define INTERVALO_MS 500
-#define CICLO 5
+// Constantes
+#define TOTAL_COMPUTADORES 15         // qtd de IPs que sao variados
+#define INTERVALO_MS 500              // 0.5 segundos 
+#define QTD_POR_CICLO 5               // solicitações distribuídas por ciclo (substitui CICLO)
+#define MIN_SOLICITACOES 50           // mínimo exigido pelo enunciado
+#define ARQUIVO "solicitacoes.txt"    // nome do arquivo de entrada
 
 typedef struct solicitacao {
     char ip[16];                 // identificação: IP de quem pediu
@@ -32,113 +34,97 @@ int gera_arquivo(char *nome_arquivo, int quantidade);   // gera solicitacoes
 int carrega_arquivo(char *nome_arquivo, Fila *entrada); // carrega solicitacoes
 int distribui(Fila *entrada, Fila filas[], int qtd);    // distribui as solicitacoes nas filas
 void espera(int ms);                                    // delay 0.05 seg
-int simular_distribuicao(Fila *entrada, Fila filas[]);   // simulacao distribuicao de acordo com ciclo
+int simular_distribuicao(Fila *entrada, Fila filas[]);  // simulacao distribuicao de acordo com ciclo
+void imprime_situacao(Fila *entrada, Fila filas[]);     // imprime as 4 filas
+void limpa_buffer(void);                                // descarta o que sobrou no teclado
 
 // Menu provisório para testar as funções da fila
+// Menu principal do simulador da fila de impressão
 int main(){
-    Fila entrada;   
-    Fila filas[3];  
+    Fila entrada;           // Fila de Entrada: recebe as solicitações do arquivo
+    Fila filas[3];          // filas[0] = máxima (1), filas[1] = normal (2), filas[2] = baixa (3)
     int opcao;              // opção escolhida no menu
-    int prio;               // prioridade digitada ou removida
-    int qtd;                // quantidade de solicitações a gerar
-    char ip[16];            // IP digitado ou removido
-    
-    srand(time(NULL));
+    int qtd;                // quantidade de solicitações (a gerar / carregadas)
 
-    inicializa_fila(&entrada);      // começa com a fila vazia
-    
-    for (int i = 0; i < 3; i++){
+    srand(time(NULL));      // semente do rand: cada execução gera solicitações diferentes
+
+    // todas as filas começam vazias
+    inicializa_fila(&entrada);
+    for (int i = 0; i < 3; i++)
         inicializa_fila(&filas[i]);
-    }
 
-    for (;;) {                   
-        printf("\n===== MENU DE TESTE =====\n");
+    for (;;) {             
+        printf("\n===== SIMULADOR DA FILA DE IMPRESSAO =====\n");
         printf("1. Gerar arquivo de solicitacoes\n");
-        printf("2. Enfileirar manualmente\n");
-        printf("3. Desenfileirar\n");
-        printf("4. Imprimir fila de entrada\n");
-        printf("5. Liberar fila\n");
-        printf("6. Carregar solicitacoes\n");
-        printf("7. Distibuir solicitacoes\n");
+        printf("2. Carregar solicitacoes do arquivo\n");
+        printf("3. Ver situacao das filas\n");
+        printf("4. Iniciar distribuicao\n");
+        printf("5. Limpar todas as filas\n");
         printf("0. Sair\n");
         printf("Opcao: ");
-        scanf("%d", &opcao);
+
+        // validacao para ver se o usuario digitou algo fora do esperado
+        if (scanf("%d", &opcao) != 1)   
+            opcao = -1;                
+        limpa_buffer();                 
 
         switch (opcao) {
-            case 1:
-                printf("Quantas solicitacoes (minimo 50)? ");
-                scanf("%d", &qtd);
-                if (qtd < 50) {                        
-                    printf("Quantidade invalida! Minimo de 50.\n");
+            case 1:     // gera um .txt com solicitações aleatórias
+                do {    // repete até digitar uma quantidade válida
+                    printf("Quantas solicitacoes (minimo %d)? ", MIN_SOLICITACOES);
+                    if (scanf("%d", &qtd) != 1)
+                        qtd = 0;
+                    limpa_buffer();
+                    if (qtd < MIN_SOLICITACOES)
+                        printf("Quantidade invalida! O minimo e %d.\n", MIN_SOLICITACOES);
+                } while (qtd < MIN_SOLICITACOES);
+
+                if (gera_arquivo(ARQUIVO, qtd) == 1)
+                    printf("Arquivo %s gerado com %d solicitacoes.\n", ARQUIVO, qtd);
+                break;
+
+            case 2:     
+                // carrega a Fila de Entrada a partir do arquivo
+                // esvazia tudo antes, para não somar com uma carga anterior
+                liberar_fila(&entrada);
+                for (int i = 0; i < 3; i++)
+                    liberar_fila(&filas[i]);
+
+                qtd = carrega_arquivo(ARQUIVO, &entrada);
+                if (qtd == -1) {                        // arquivo não existe
+                    printf("Gere o arquivo primeiro (opcao 1).\n");
                     break;
                 }
-                if (gera_arquivo("solicitacoes.txt", qtd) == 1)
-                    printf("Arquivo gerado! Abra o solicitacoes.txt para conferir.\n");
-                break;
-
-            case 2:
-                printf("Prioridade (1-3): ");
-                scanf("%d", &prio);
-                printf("IP: ");
-                scanf("%15s", ip);                      
-                enfileira(&entrada, prio, ip);
-                printf("Solicitacao enfileirada!\n");
-                break;
-
-            case 3:
-                if (desenfileira(&entrada, &prio, ip) == 0)
-                    printf("Fila vazia! Nada a remover.\n");
-                else
-                    printf("Saiu da fila: [%d | %s]\n", prio, ip);
-                break;
-
-            case 4:
-                imprime_fila(&entrada, "Entrada");
-                break;
-
-            case 5:
-                liberar_fila(&entrada);   
-                for (int i = 0; i < 3; i++){ 
-                    liberar_fila(&filas[i]);     
-                } 
-
-                printf("Fila liberada!\n");
-                break;
-
-            case 6:
-                qtd = carrega_arquivo("solicitacoes.txt", &entrada);
-                if (qtd == -1){
+                if (qtd < MIN_SOLICITACOES) {           // o enunciado exige no mínimo 50
+                    printf("O arquivo tem %d solicitacoes validas, mas o minimo e %d.\n", qtd, MIN_SOLICITACOES);
+                    liberar_fila(&entrada);             // não deixa a fila carregada pela metade
                     break;
                 }
-                printf("%d solicitacoes carregadas.\n", qtd);
-                if (qtd < 50){
-                    printf("Atencao: o enunciado exige no minimo 50!\n");
-                    imprime_fila(&entrada, "Entrada");
-                    break;
-                }
-                break;
-            
-            case 7:
-                qtd = distribui(&entrada, filas, 5);     
-                printf("%d solicitacoes distribuidas.\n", qtd);
-                imprime_fila(&entrada, "Entrada");
-                imprime_fila(&filas[0], "Fila 0");
-                imprime_fila(&filas[1], "Fila 1");
-                imprime_fila(&filas[2], "Fila 2");
-                  
-                break;
-            case 8:
-                simular_distribuicao(&entrada, filas);
+                printf("%d solicitacoes carregadas na Fila de Entrada.\n", qtd);
+                imprime_situacao(&entrada, filas);
                 break;
 
-            case 0:
-                // devolve a memória antes de sair
-                liberar_fila(&entrada);   
-                for (int i = 0; i < 3; i++){ 
-                    liberar_fila(&filas[i]);     
-                }            
+            case 3:     // mostra as 4 filas sem alterar nada
+                imprime_situacao(&entrada, filas);
+                break;
+
+            case 4:     // distribui 5 a cada 0,5 s até a entrada esvaziar
+                simular_distribuicao(&entrada, filas);  // já avisa se a entrada estiver vazia
+                break;
+
+            case 5:     // esvazia as 4 filas
+                liberar_fila(&entrada);
+                for (int i = 0; i < 3; i++)
+                    liberar_fila(&filas[i]);
+                printf("Todas as filas foram esvaziadas.\n");
+                break;
+
+            case 0:     // devolve toda a memória antes de sair
+                liberar_fila(&entrada);
+                for (int i = 0; i < 3; i++)
+                    liberar_fila(&filas[i]);
                 printf("Saindo...\n");
-                return 0;                           
+                return 0;                      
 
             default:
                 printf("Opcao invalida!\n");
@@ -146,8 +132,23 @@ int main(){
     }
 }
 
+// Descarta tudo o que sobrou no buffer do teclado até o Enter
+// Evita que uma letra digitada no lugar de um número trave o programa
+void limpa_buffer(void){
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);   // lê e joga fora caractere por caractere
+}
 
-// Simulador de Impressora
+// Imprime a situação das 4 filas: entrada + as 3 de prioridade
+void imprime_situacao(Fila *entrada, Fila filas[]){
+    char *nomes[3] = {"Fila 0 - maxima", "Fila 1 - normal", "Fila 2 - baixa"};
+
+    imprime_fila(entrada, "Entrada");          // entrada já é ponteiro: sem &
+    for (int i = 0; i < 3; i++)
+        imprime_fila(&filas[i], nomes[i]);     // filas[i] é struct: com &
+}
+
+// Simulador de distribuicao
 int simular_distribuicao(Fila *entrada, Fila filas[]){
     int ciclo = 1;
     int qtd;
@@ -158,7 +159,7 @@ int simular_distribuicao(Fila *entrada, Fila filas[]){
     }
 
     while (entrada->inicio != NULL){
-        qtd = distribui(entrada, filas, CICLO);
+        qtd = distribui(entrada, filas, QTD_POR_CICLO);
 
         printf("\n========== CICLO %d ==========\n", ciclo);
         printf("%d solicitacoes distribuidas\n", qtd);
