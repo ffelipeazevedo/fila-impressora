@@ -173,7 +173,7 @@ int simular_distribuicao(Fila *entrada, Fila filas[]){
         ciclo++;
     }
 
-    printf("\nDistribuicao concluida em %d ciclos!\n", qtd);
+    printf("\nDistribuicao concluida em %d ciclos!\n", ciclo - 1);
     return ciclo - 1;
 }
 
